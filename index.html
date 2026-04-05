@@ -408,10 +408,10 @@
         // 用 Make 查詢教練資料
         async function fetchCoachInfo(lineId) {
             try {
-                const response = await fetchWithTimeout(CONFIG.makeWebhookUrl, {
+                const response = await fetchWithTimeout(CONFIG.edgeFunctionUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'search_coach', lineId: lineId })
+                    body: JSON.stringify({ action: 'searchCoach', lineId: lineId })
                 }, 10000);
                 
                 if (response.ok) {
