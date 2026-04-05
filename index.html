@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>【重訓／器械】體驗回報表 | 衡點健康</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <style>
+        :root {
+            --white: #ffffff;
+            --gray: #808080;
+            --gray-light: #f5f5f5;
+            --green: #7ac19a;
+            --green-light: #e2ede6;
+            --green-dark: #5f846f;
+            --pink: #f2ac98;
+            --pink-light: #faece8;
+            --pink-dark: #c67566;
+            --yellow: #ffe08b;
+            --yellow-light: #fcf4e3;
+            --yellow-dark: #ba9e60;
+            --blue: #9fcccc;
+            --blue-light: #daedec;
+            --blue-dark: #66888e;
+            --bg-main: var(--green-light);
+            --bg-card: var(--white);
+            --bg-input: var(--white);
+            --primary: var(--green);
+            --primary-dark: var(--green-dark);
+            --text-primary: #2d3a33;
+            --text-secondary: var(--gray);
+            --text-light: #9ca89f;
+            --border: #d8e0db;
+            --error: var(--pink-dark);
+            --radius: 12px;
+            --radius-lg: 20px;
+            --shadow: 0 4px 20px rgba(95, 132, 111, 0.1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { overflow-x: hidden; width: 100%; max-width: 100vw; }
+        body { font-family: 'Noto Sans TC', -apple-system, sans-serif; background: var(--bg-main); color: var(--text-primary); min-height: 100vh; line-height: 1.6; }
+        .header { background: var(--white); padding: 16px 24px; text-align: center; box-shadow: 0 2px 10px rgba(95, 132, 111, 0.08); }
+        .logo { font-size: 20px; font-weight: 700; color: var(--green-dark); letter-spacing: 2px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .logo-icon { font-size: 24px; }
+        .logo-sub { font-size: 15px; font-weight: 600; color: var(--text-primary); margin-top: 4px; }
+        .coach-info-bar { background: var(--blue-light); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+        .coach-info-bar.loading { justify-content: center; }
+        .coach-avatar { width: 36px; height: 36px; background: var(--blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; color: var(--white); }
+        .coach-details { flex: 1; margin-left: 12px; }
+        .coach-name { font-size: 16px; font-weight: 600; color: var(--text-primary); }
+        .coach-role { font-size: 13px; color: var(--blue-dark); }
+        .coach-status { font-size: 13px; color: var(--text-light); }
+        .notice-box { background: var(--yellow-light); border-left: 4px solid var(--yellow-dark); border-radius: 0 var(--radius) var(--radius) 0; padding: 16px 18px; margin-bottom: 20px; }
+        .notice-title { font-size: 15px; font-weight: 600; color: var(--yellow-dark); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+        .notice-list { font-size: 14px; color: var(--text-primary); line-height: 1.8; padding-left: 20px; }
+        .notice-list li { margin-bottom: 4px; }
+        .notice-highlight { color: var(--pink-dark); font-weight: 500; }
+        .main-content { max-width: 680px; margin: 0 auto; padding: 20px 20px 40px; width: 100%; }
+        .card { background: var(--bg-card); border-radius: var(--radius-lg); padding: 28px; margin-bottom: 16px; box-shadow: var(--shadow); }
+        .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+        .card-icon { width: 44px; height: 44px; border-radius: 12px; background: var(--green-light); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .card-title { font-size: 20px; font-weight: 700; color: var(--text-primary); }
+        .card-desc { font-size: 14px; color: var(--text-light); margin-bottom: 24px; margin-left: 56px; }
+        .section-title { font-size: 16px; font-weight: 600; color: var(--green-dark); margin: 28px 0 16px; padding-bottom: 10px; border-bottom: 2px solid var(--green-light); display: flex; align-items: center; gap: 8px; }
+        .section-title:first-of-type { margin-top: 0; }
+        .section-dot { width: 8px; height: 8px; background: var(--primary); border-radius: 50%; }
+        .form-group { margin-bottom: 24px; }
+        .form-group:last-child { margin-bottom: 0; }
+        .form-label { display: block; font-size: 16px; font-weight: 500; color: var(--text-primary); margin-bottom: 10px; }
+        .form-label .required { color: var(--pink-dark); margin-left: 2px; }
+        .form-label .hint { font-weight: 400; color: var(--text-light); font-size: 14px; display: block; margin-top: 6px; line-height: 1.6; }
+        .form-input, .form-textarea { width: 100%; padding: 12px 16px; font-size: 16px; font-family: inherit; border: 2px solid var(--border); border-radius: var(--radius); background: var(--bg-input); color: var(--text-primary); transition: all 0.25s ease; }
+        .form-input:focus, .form-textarea:focus { outline: none; border-color: var(--primary); }
+        .form-input::placeholder, .form-textarea::placeholder { color: var(--text-light); }
+        .form-input:disabled, .form-input:read-only { background: var(--gray-light); color: var(--text-secondary); }
+        .form-textarea { min-height: 100px; resize: vertical; line-height: 1.6; }
+        .member-search-section { background: var(--blue-light); border-radius: var(--radius); padding: 20px; margin-bottom: 24px; }
+        .search-title { font-size: 15px; font-weight: 600; color: var(--blue-dark); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .search-row { display: flex; gap: 12px; align-items: end; }
+        .search-input-group { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+        .search-input-group label { font-size: 14px; color: var(--text-secondary); }
+        .search-input-group input { padding: 10px 14px; font-size: 16px; font-family: inherit; border: 2px solid var(--border); border-radius: var(--radius); background: var(--white); width: 100%; }
+        .search-input-group input:focus { outline: none; border-color: var(--blue); }
+        .btn-search { padding: 10px 20px; font-size: 15px; font-weight: 600; font-family: inherit; background: var(--blue); color: var(--white); border: none; border-radius: var(--radius); cursor: pointer; white-space: nowrap; transition: all 0.25s ease; }
+        .btn-search:hover { background: var(--blue-dark); }
+        .btn-search:disabled { opacity: 0.6; cursor: not-allowed; }
+        .search-results { margin-top: 16px; display: none; max-height: 300px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--white); }
+        .search-results.show { display: block; }
+        .search-results.empty { padding: 16px; text-align: center; color: var(--text-light); }
+        .search-result-item { padding: 14px 16px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.2s; }
+        .search-result-item:last-child { border-bottom: none; }
+        .search-result-item:hover { background: var(--green-light); }
+        .result-name { font-weight: 600; font-size: 15px; color: var(--text-primary); }
+        .result-info { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+        .result-coach { font-size: 12px; color: var(--blue-dark); margin-top: 2px; }
+        .selected-member { margin-top: 16px; padding: 14px; border-radius: var(--radius); background: var(--green-light); border: 1px solid var(--green); display: none; }
+        .selected-member.show { display: block; }
+        .selected-member-info { display: flex; align-items: center; gap: 12px; }
+        .selected-avatar { width: 40px; height: 40px; background: var(--green); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600; color: var(--white); }
+        .selected-details { flex: 1; }
+        .selected-name { font-weight: 600; font-size: 16px; color: var(--green-dark); }
+        .selected-extra { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+        .btn-clear { padding: 6px 12px; font-size: 12px; background: transparent; border: 1px solid var(--green-dark); color: var(--green-dark); border-radius: 6px; cursor: pointer; }
+        .btn-clear:hover { background: var(--green-dark); color: var(--white); }
+        .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-grid-2 .form-group { margin-bottom: 0; }
+        .inline-radio-group { display: flex; flex-wrap: wrap; gap: 20px; }
+        .inline-radio-option { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .inline-radio-option input[type="radio"] { width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer; margin: 0; }
+        .inline-radio-text { font-size: 16px; font-weight: 500; color: var(--text-primary); display: flex; align-items: center; gap: 6px; }
+        .inline-radio-icon { font-size: 18px; }
+        .checkbox-group { display: flex; flex-wrap: wrap; gap: 10px; }
+        .checkbox-option { position: relative; }
+        .checkbox-option input { position: absolute; opacity: 0; }
+        .checkbox-label { display: inline-flex; align-items: center; padding: 10px 18px; background: var(--gray-light); border: 2px solid var(--border); border-radius: 50px; cursor: pointer; font-size: 15px; font-weight: 500; color: var(--text-primary); transition: all 0.25s ease; }
+        .checkbox-option input:checked + .checkbox-label { background: var(--green-light); border-color: var(--primary); color: var(--green-dark); }
+        .scale-group { display: flex; justify-content: space-between; gap: 6px; width: 100%; }
+        .scale-option { flex: 1; position: relative; }
+        .scale-option input { position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer; z-index: 1; }
+        .scale-label { display: flex; align-items: center; justify-content: center; padding: 14px 8px; background: var(--gray-light); border: 2px solid var(--border); border-radius: 10px; cursor: pointer; font-size: 16px; font-weight: 600; color: var(--text-secondary); transition: all 0.25s ease; }
+        .scale-option input:checked + .scale-label { background: var(--primary); border-color: var(--primary); color: var(--white); transform: scale(1.05); box-shadow: 0 4px 12px rgba(122, 193, 154, 0.4); }
+        .scale-labels { display: flex; justify-content: space-between; margin-top: 8px; font-size: 13px; color: var(--text-light); }
+        .other-input-group { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+        .other-input { flex: 1; padding: 10px 14px; font-size: 15px; font-family: inherit; border: 2px solid var(--border); border-radius: var(--radius); background: var(--bg-input); color: var(--text-primary); }
+        .other-input:focus { outline: none; border-color: var(--primary); }
+        .form-input.error, .form-textarea.error { border-color: var(--error); }
+        .error-message { font-size: 13px; color: var(--error); margin-top: 6px; display: none; }
+        .form-group.has-error .error-message { display: block; }
+        .submit-section { margin-top: 32px; }
+        .btn-submit { width: 100%; padding: 16px 24px; font-size: 17px; font-weight: 600; font-family: inherit; border-radius: var(--radius); cursor: pointer; transition: all 0.25s ease; display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--primary); color: var(--white); border: none; box-shadow: 0 4px 15px rgba(122, 193, 154, 0.4); }
+        .btn-submit:hover { background: var(--primary-dark); transform: translateY(-2px); }
+        .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .success-page { display: none; text-align: center; padding: 60px 24px; }
+        .success-page.active { display: block; animation: fadeSlideIn 0.4s ease; }
+        @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+        .success-icon { width: 80px; height: 80px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; font-size: 40px; color: var(--white); animation: scaleIn 0.5s ease 0.2s both; }
+        @keyframes scaleIn { from { transform: scale(0); } to { transform: scale(1); } }
+        .success-title { font-size: 24px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; }
+        .success-message { font-size: 15px; color: var(--text-secondary); margin-bottom: 32px; line-height: 1.8; }
+        .btn-reset { display: inline-flex; padding: 14px 40px; font-size: 15px; font-weight: 600; font-family: inherit; border-radius: var(--radius); cursor: pointer; background: var(--primary); color: var(--white); border: none; }
+        .loading-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255, 255, 255, 0.95); z-index: 1000; align-items: center; justify-content: center; flex-direction: column; }
+        .loading-overlay.active { display: flex; }
+        .loading-spinner { width: 48px; height: 48px; border: 4px solid var(--green-light); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 16px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text { font-size: 15px; color: var(--text-secondary); font-weight: 500; }
+        .error-page { display: none; text-align: center; padding: 60px 24px; }
+        .error-page.active { display: block; }
+        .error-icon { width: 80px; height: 80px; background: var(--pink-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; font-size: 40px; }
+        .error-title { font-size: 20px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; }
+        .error-desc { font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; white-space: pre-line; }
+        @media (max-width: 767px) {
+            .main-content { padding: 16px 12px 40px; }
+            .card { padding: 20px 22px; }
+            .search-row { flex-direction: column; gap: 10px; }
+            .btn-search { width: 100%; }
+            .form-grid-2 { grid-template-columns: 1fr 1fr; gap: 12px; }
+            .scale-label { padding: 12px 4px; font-size: 14px; }
+        }
+        @media (max-width: 480px) {
+            .scale-label { padding: 10px 2px; font-size: 13px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo"><span class="logo-icon">🌿</span>衡點健康</div>
+        <div class="logo-sub">【重訓／器械】體驗回報表</div>
+    </header>
+    <div class="coach-info-bar loading" id="coachInfoBar"><span class="coach-status">正在載入教練資訊...</span></div>
+    <main class="main-content">
+        <div class="error-page" id="errorPage">
+            <div class="error-icon">⚠️</div>
+            <h2 class="error-title" id="errorTitle">無法載入</h2>
+            <p class="error-desc" id="errorDesc">請透過 LINE 開啟此表單</p>
+        </div>
+        <div class="notice-box" id="noticeBox" style="display: none;">
+            <div class="notice-title">📋 填表須知</div>
+            <ol class="notice-list">
+                <li>授課前主動與行政確認客戶預約時間與資訊</li>
+                <li>建議課程開始 <strong>10分鐘前</strong> 須抵達場館準備</li>
+                <li>體驗課前確實進行 Inbody 檢測及諮詢表填寫</li>
+                <li>體驗後一律由場館行政談單，如遇休假則由教練進行</li>
+                <li>體驗課後請於 <span class="notice-highlight">8小時內</span> 回填此表</li>
+                <li>一對一體驗：總長 45 分鐘 ｜ 一對二體驗：總長 60 分鐘</li>
+            </ol>
+        </div>
+        <form id="feedbackForm" style="display: none;">
+            <div class="card">
+                <div class="card-header"><div class="card-icon">📝</div><div class="card-title">體驗回報表</div></div>
+                <div class="card-desc">請於體驗課後填寫以下資訊</div>
+                
+                <!-- 搜尋諮詢單 -->
+                <div class="member-search-section">
+                    <div class="search-title">🔍 搜尋諮詢單</div>
+                    <div class="search-row">
+                        <div class="search-input-group">
+                            <label>輸入客戶姓名</label>
+                            <input type="text" id="searchKeyword" placeholder="輸入姓名關鍵字...">
+                        </div>
+                        <button type="button" class="btn-search" id="btnSearch" onclick="searchConsultation()">搜尋</button>
+                    </div>
+                    <div class="search-results" id="searchResults"></div>
+                    <div class="selected-member" id="selectedMember">
+                        <div class="selected-member-info">
+                            <div class="selected-avatar" id="selectedAvatar">?</div>
+                            <div class="selected-details">
+                                <div class="selected-name" id="selectedName">-</div>
+                                <div class="selected-extra" id="selectedExtra">-</div>
+                            </div>
+                            <button type="button" class="btn-clear" onclick="clearSelection()">清除</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section-title"><span class="section-dot"></span>課程類型</div>
+                <div class="form-group">
+                    <label class="form-label">請選擇體驗課程<span class="required">*</span></label>
+                    <div class="inline-radio-group">
+                        <label class="inline-radio-option"><input type="radio" name="courseType" value="重訓" required><span class="inline-radio-text"><span class="inline-radio-icon">🏋️</span>重訓</span></label>
+                        <label class="inline-radio-option"><input type="radio" name="courseType" value="器械皮拉提斯"><span class="inline-radio-text"><span class="inline-radio-icon">🧘</span>器械皮拉提斯</span></label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">是否為 AI 檢測之客戶<span class="required">*</span></label>
+                    <div class="inline-radio-group">
+                        <label class="inline-radio-option"><input type="radio" name="isAiCustomer" value="是" required><span class="inline-radio-text">是</span></label>
+                        <label class="inline-radio-option"><input type="radio" name="isAiCustomer" value="否"><span class="inline-radio-text">否</span></label>
+                    </div>
+                </div>
+                
+                <div class="section-title"><span class="section-dot" style="background: var(--blue);"></span>基本資訊</div>
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label class="form-label">客戶姓名<span class="required">*</span></label>
+                        <input type="text" class="form-input" id="clientName" placeholder="搜尋後自動填入" readonly required>
+                        <input type="hidden" id="clientPhone">
+                        <div class="error-message">請先搜尋並選擇客戶</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">負責教練<span class="required">*</span></label>
+                        <select class="form-input" id="coachName" required>
+                          <option value="">請選擇教練</option>
+                          <option>邱邱</option>
+                          <option>孟圓</option>
+                          <option>TIANA</option>
+                          <option>YUNA</option>
+                          <option>Candice</option>
+                          <option>冠儀</option>
+                          <option>BORIS</option>
+                          <option>ALBERT</option>
+                          <option>ALLAN</option>
+                          <option>SKY</option>
+                          <option>KAI</option>
+                          <option>JEFF</option>
+                    </select>
+                </div>
+                    
+                </div>
+                <div class="form-group">
+                    <label class="form-label">體驗時段<span class="required">*</span></label>
+                    <input type="datetime-local" class="form-input" id="sessionTime" required>
+                </div>
+                
+                <div class="section-title"><span class="section-dot" style="background: var(--pink);"></span>課程內容</div>
+                <div class="form-group">
+                    <label class="form-label">課前評估學員的哪些問題<span class="required">*</span><span class="hint">如 Inbody、課前諮詢客人需求等</span></label>
+                    <textarea class="form-textarea" id="preAssessment" placeholder="請描述課前評估的內容..." required></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">今天帶給學生的課程安排內容<span class="required">*</span></label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-option"><input type="checkbox" name="courseContent" id="content1" value="肩背"><label class="checkbox-label" for="content1">肩背</label></div>
+                        <div class="checkbox-option"><input type="checkbox" name="courseContent" id="content2" value="核心"><label class="checkbox-label" for="content2">核心</label></div>
+                        <div class="checkbox-option"><input type="checkbox" name="courseContent" id="content3" value="臀腿"><label class="checkbox-label" for="content3">臀腿</label></div>
+                        <div class="checkbox-option"><input type="checkbox" name="courseContent" id="content4" value="柔軟度"><label class="checkbox-label" for="content4">柔軟度</label></div>
+                    </div>
+                    <div class="other-input-group"><input type="text" class="other-input" id="contentOther" placeholder="其他（請說明）"></div>
+                </div>
+                
+                <div class="section-title"><span class="section-dot" style="background: var(--yellow);"></span>購課意願評估</div>
+                <div class="form-group">
+                    <label class="form-label">課後認為學員買課的意願<span class="required">*</span><span class="hint">當下就成交請選 10</span></label>
+                    <div class="scale-group">
+                        <div class="scale-option"><input type="radio" name="purchaseWillingness" id="scale1" value="1" required><label class="scale-label" for="scale1">1</label></div>
+                        <div class="scale-option"><input type="radio" name="purchaseWillingness" id="scale2" value="2"><label class="scale-label" for="scale2">2</label></div>
+                        <div class="scale-option"><input type="radio" name="purchaseWillingness" id="scale3" value="3"><label class="scale-label" for="scale3">3</label></div>
+                        <div class="scale-option"><input type="radio" name="purchaseWillingness" id="scale4" value="4"><label class="scale-label" for="scale4">4</label></div>
+                        <div class="scale-option"><input type="radio" name="purchaseWillingness" id="scale5" value="5"><label class="scale-label" for="scale5">5</label></div>
+                        <div class="scale-option"><input type="radio" name="purchaseWillingness" id="scale6" value="6"><label class="scale-label" for="scale6">6</label></div>
+                        <div class="scale-option"><input type="radio" name="purchaseWillingness" id="scale7" value="7"><label class="scale-label" for="scale7">7</label></div>
+                        <div class="scale-option"><input type="radio" name="purchaseWillingness" id="scale8" value="8"><label class="scale-label" for="scale8">8</label></div>
+                        <div class="scale-option"><input type="radio" name="purchaseWillingness" id="scale9" value="9"><label class="scale-label" for="scale9">9</label></div>
+                        <div class="scale-option"><input type="radio" name="purchaseWillingness" id="scale10" value="10"><label class="scale-label" for="scale10">10</label></div>
+                    </div>
+                    <div class="scale-labels"><span>意願低</span><span>當下成交</span></div>
+                </div>
+                
+                <div class="section-title"><span class="section-dot" style="background: var(--blue);"></span>客服協助</div>
+                <div class="form-group">
+                    <label class="form-label">客服人員可以如何關心<span class="required">*</span><span class="hint">請描述學員現場的實際考量。例如：價格、課程期限問題、想嘗試其他課種等。<br>※ 請如實填寫讓客服人員可以釋出彈性，協助老師成交</span></label>
+                    <textarea class="form-textarea" id="customerCare" placeholder="請詳細描述學員的考量與狀態..." required></textarea>
+                </div>
+                
+                <div class="section-title"><span class="section-dot" style="background: var(--pink);"></span>優惠方案</div>
+                <div class="form-group">
+                    <label class="form-label">體驗後看到優惠表對於哪一項優惠更感興趣<span class="required">*</span></label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-option"><input type="checkbox" name="promoInterest" id="promo1" value="肌肉賦能伸展課程"><label class="checkbox-label" for="promo1">肌肉賦能伸展課程</label></div>
+                        <div class="checkbox-option"><input type="checkbox" name="promoInterest" id="promo2" value="AI 3D體態檢測"><label class="checkbox-label" for="promo2">AI 3D體態檢測</label></div>
+                        <div class="checkbox-option"><input type="checkbox" name="promoInterest" id="promo3" value="課卡展延"><label class="checkbox-label" for="promo3">課卡展延</label></div>
+                        <div class="checkbox-option"><input type="checkbox" name="promoInterest" id="promo4" value="沒有提供優惠表給學員"><label class="checkbox-label" for="promo4">沒有提供優惠表</label></div>
+                    </div>
+                    <div class="other-input-group"><input type="text" class="other-input" id="promoOther" placeholder="其他（請說明）"></div>
+                </div>
+                
+                <!-- 新增：當下談單人員 -->
+                <div class="section-title"><span class="section-dot" style="background: var(--yellow);"></span>談單人員</div>
+                <div class="form-group">
+                    <label class="form-label">當下談單人員<span class="required">*</span></label>
+                    <div class="inline-radio-group">
+                        <label class="inline-radio-option"><input type="radio" name="salesPerson" value="行政" required><span class="inline-radio-text">行政</span></label>
+                        <label class="inline-radio-option"><input type="radio" name="salesPerson" value="線上客服"><span class="inline-radio-text">線上客服</span></label>
+                        <label class="inline-radio-option"><input type="radio" name="salesPerson" value="老師本人"><span class="inline-radio-text">老師本人</span></label>
+                    </div>
+                </div>
+                
+                <div class="submit-section"><button type="submit" class="btn-submit" id="submitBtn">提交表單 ✓</button></div>
+            </div>
+        </form>
+        <div class="success-page" id="successPage">
+            <div class="success-icon">✓</div>
+            <h2 class="success-title">提交成功！</h2>
+            <p class="success-message">體驗回報表已成功送出</p>
+            <button class="btn-reset" onclick="resetForm()">填寫新表單</button>
+        </div>
+    </main>
+    <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div><div class="loading-text" id="loadingText">載入中...</div></div>
+
+    <script>
+        /* ===== 設定 ===== */
+        const CONFIG = {
+            liffId: '2007947083-zbtrhdFK',
+            edgeFunctionUrl: 'https://mnjilhpztnowaplggvkk.supabase.co/functions/v1/booking-api',
+            makeWebhookUrl: 'https://hook.us2.make.com/mdd5t4rm1dhfegf6i8dmseiqcja6szye'
+        };
+
+        let currentCoach = { lineId: '', name: '', displayName: '', coachId: '', coachType: '' };
+        let selectedConsultation = null;
+
+        async function callEdge(action, payload) {
+            const response = await fetchWithTimeout(CONFIG.edgeFunctionUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action, ...payload })
+            }, 15000);
+            return response;
+        }
+
+        async function fetchWithTimeout(url, options, timeout = 15000) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), timeout);
+            try {
+                const response = await fetch(url, { ...options, signal: controller.signal });
+                clearTimeout(timeoutId);
+                return response;
+            } catch (err) {
+                clearTimeout(timeoutId);
+                throw err;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            showLoading('正在初始化...');
+            
+            document.getElementById('searchKeyword').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') { e.preventDefault(); searchConsultation(); }
+            });
+            
+            try {
+                await liff.init({ liffId: CONFIG.liffId });
+                if (liff.isLoggedIn()) {
+                    const profile = await liff.getProfile();
+                    currentCoach.lineId = profile.userId;
+                    currentCoach.displayName = profile.displayName;
+                    
+                    // 用 Make 查詢教練資料
+                    await fetchCoachInfo(profile.userId);
+                } else {
+                    liff.login();
+                    return;
+                }
+            } catch (err) {
+                console.error('LIFF Error:', err);
+                if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                    currentCoach = { lineId: 'TEST', name: '測試教練', displayName: '測試教練' };
+                    showCoachInfo();
+                    showForm();
+                } else {
+                    showError('初始化失敗', err.message);
+                }
+            }
+            hideLoading();
+        });
+
+        // 用 Make 查詢教練資料
+        async function fetchCoachInfo(lineId) {
+            try {
+                const response = await fetchWithTimeout(CONFIG.makeWebhookUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'search_coach', lineId: lineId })
+                }, 10000);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.found) {
+    currentCoach.name = data.name;
+    currentCoach.coachId = data.id;
+    currentCoach.coachType = data.coachType;
+    showCoachInfo();
+    showForm();
+    preSelectCourseType(data.coachType);
+    return;
+}
+                }
+                
+                // 找不到教練，用 LINE 顯示名稱
+                if (currentCoach.displayName) {
+                    currentCoach.name = currentCoach.displayName;
+                    showCoachInfo();
+                    showForm();
+                    console.warn('找不到教練資料，使用 LINE 顯示名稱');
+                } else {
+                    showError('找不到教練資料', '請聯繫管理員設定此 LINE ID');
+                }
+            } catch (err) {
+                console.error('Fetch coach error:', err);
+                // 查詢失敗，用 LINE 顯示名稱
+                if (currentCoach.displayName) {
+                    currentCoach.name = currentCoach.displayName;
+                    showCoachInfo();
+                    showForm();
+                } else {
+                    showError('查詢教練資料失敗', err.message);
+                }
+            }
+        }
+
+        // 根據教練類型預選課程
+        function preSelectCourseType(coachType) {
+            if (coachType === 'strength_training') {
+                const radio = document.querySelector('input[name="courseType"][value="重訓"]');
+                if (radio) radio.checked = true;
+            } else if (coachType === 'pilates') {
+                const radio = document.querySelector('input[name="courseType"][value="器械皮拉提斯"]');
+                if (radio) radio.checked = true;
+            }
+            // ai_analysis, stretching 不預選
+        }
+        
+        function showCoachInfo() {
+    const coachBar = document.getElementById('coachInfoBar');
+    coachBar.classList.remove('loading');
+    coachBar.innerHTML = `<div class="coach-avatar">${currentCoach.name?.charAt(0) || '?'}</div><div class="coach-details"><div class="coach-name">${escapeHtml(currentCoach.name)}</div><div class="coach-role">體驗教練</div></div><span class="coach-status">已登入 ✓</span>`;
+    
+    // 帶入教練名稱，名單沒有時動態新增
+    const sel = document.getElementById('coachName');
+    if (currentCoach.name) {
+        const exists = [...sel.options].some(o => o.value === currentCoach.name);
+        if (!exists) {
+            const opt = document.createElement('option');
+            opt.value = currentCoach.name;
+            opt.textContent = currentCoach.name;
+            sel.appendChild(opt);
+        }
+        sel.value = currentCoach.name;
+    }
+    
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    document.getElementById('sessionTime').value = now.toISOString().slice(0, 16);
+}
+
+        function showForm() {
+            document.getElementById('errorPage').style.display = 'none';
+            document.getElementById('noticeBox').style.display = 'block';
+            document.getElementById('feedbackForm').style.display = 'block';
+            document.getElementById('feedbackForm').addEventListener('submit', submitForm);
+        }
+
+        function showError(title, desc) {
+            hideLoading();
+            document.getElementById('errorPage').classList.add('active');
+            document.getElementById('errorTitle').textContent = title;
+            document.getElementById('errorDesc').textContent = desc;
+        }
+
+        // 搜尋諮詢單
+        async function searchConsultation() {
+            const keyword = document.getElementById('searchKeyword').value.trim();
+            const resultsDiv = document.getElementById('searchResults');
+            const btn = document.getElementById('btnSearch');
+            
+            if (!keyword) {
+                resultsDiv.className = 'search-results show empty';
+                resultsDiv.innerHTML = '請輸入姓名關鍵字';
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.textContent = '搜尋中...';
+            
+            try {
+                const response = await callEdge('searchConsultation', { keyword: keyword });
+                const data = await response.json();
+                
+                if (data.success && data.data && data.data.length > 0) {
+    resultsDiv.className = 'search-results show';
+    resultsDiv.innerHTML = 
+        '<div style="padding: 10px 14px; font-size: 13px; color: #66888e; border-bottom: 1px solid #d8e0db;">👆 請點選</div>' +
+        data.data.map((item, index) => `
+            <div class="search-result-item" onclick="selectConsultation(${index})">
+                <div class="result-name">${escapeHtml(item.name)}</div>
+            </div>
+        `).join('');
+    window.searchResults = data.data;
+                } else {
+                    resultsDiv.className = 'search-results show empty';
+                    resultsDiv.innerHTML = '找不到符合的諮詢單';
+                }
+            } catch (err) {
+                console.error('Search error:', err);
+                resultsDiv.className = 'search-results show empty';
+                resultsDiv.innerHTML = '搜尋失敗，請稍後再試';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '搜尋';
+            }
+        }
+
+        function selectConsultation(index) {
+            const item = window.searchResults[index];
+            selectedConsultation = item;
+            
+            document.getElementById('searchResults').className = 'search-results';
+            document.getElementById('selectedMember').className = 'selected-member show';
+            document.getElementById('selectedAvatar').textContent = item.name?.charAt(0) || '?';
+            document.getElementById('selectedName').textContent = item.name;
+            document.getElementById('selectedExtra').style.display = 'none';
+            
+            document.getElementById('clientName').value = item.name || '';
+            document.getElementById('clientPhone').value = item.phone || '';
+        }
+
+        function clearSelection() {
+            selectedConsultation = null;
+            document.getElementById('selectedMember').className = 'selected-member';
+            document.getElementById('clientName').value = '';
+            document.getElementById('clientPhone').value = '';
+            document.getElementById('searchKeyword').value = '';
+        }
+
+        function validateForm() {
+            if (!selectedConsultation) { alert('請先搜尋並選擇客戶'); return false; }
+            if (!document.querySelector('input[name="courseType"]:checked')) { alert('請選擇課程類型'); return false; }
+            if (!document.querySelector('input[name="isAiCustomer"]:checked')) { alert('請選擇是否為 AI 檢測之客戶'); return false; }
+            if (!document.querySelector('input[name="purchaseWillingness"]:checked')) { alert('請選擇學員買課意願'); return false; }
+            if (!document.querySelector('input[name="salesPerson"]:checked')) { alert('請選擇當下談單人員'); return false; }
+            if (!document.getElementById('preAssessment').value.trim()) { alert('請填寫課前評估內容'); return false; }
+            if (!document.getElementById('customerCare').value.trim()) { alert('請填寫客服關心內容'); return false; }
+            
+            const contentChecked = document.querySelectorAll('input[name="courseContent"]:checked').length > 0;
+            if (!contentChecked && !document.getElementById('contentOther').value.trim()) { alert('請選擇或填寫課程安排內容'); return false; }
+            
+            const promoChecked = document.querySelectorAll('input[name="promoInterest"]:checked').length > 0;
+            if (!promoChecked && !document.getElementById('promoOther').value.trim()) { alert('請選擇或填寫感興趣的優惠方案'); return false; }
+            
+            return true;
+        }
+
+        async function submitForm(e) {
+            e.preventDefault();
+            if (!validateForm()) return;
+            
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            showLoading('正在提交表單並更新諮詢單...');
+            
+            try {
+                const courseContent = [];
+                document.querySelectorAll('input[name="courseContent"]:checked').forEach(cb => courseContent.push(cb.value));
+                if (document.getElementById('contentOther').value.trim()) courseContent.push(document.getElementById('contentOther').value.trim());
+                
+                const promoInterest = [];
+                document.querySelectorAll('input[name="promoInterest"]:checked').forEach(cb => promoInterest.push(cb.value));
+                if (document.getElementById('promoOther').value.trim()) promoInterest.push(document.getElementById('promoOther').value.trim());
+                
+                const data = {
+                    clientName: document.getElementById('clientName').value,
+                    phone: formatPhone(document.getElementById('clientPhone').value),
+                    courseType: document.querySelector('input[name="courseType"]:checked').value,
+                    isAiCustomer: document.querySelector('input[name="isAiCustomer"]:checked').value,
+                    coachName: document.getElementById('coachName').value,
+                    sessionTime: document.getElementById('sessionTime').value,
+                    preAssessment: document.getElementById('preAssessment').value,
+                    courseContent: courseContent.join(', '),
+                    purchaseWillingness: document.querySelector('input[name="purchaseWillingness"]:checked').value,
+                    customerCare: document.getElementById('customerCare').value,
+                    promoInterest: promoInterest.join(', '),
+                    salesPerson: document.querySelector('input[name="salesPerson"]:checked').value,
+                    submittedAt: formatSessionTime(new Date()),
+                    source: 'web_form'
+                };
+                
+                const response = await fetchWithTimeout(CONFIG.makeWebhookUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'submit', ...data })
+}, 30000);
+                
+                const result = await response.json();
+                if (result.success) {
+                    showSuccess();
+                } else {
+                    throw new Error(result.error || '提交失敗');
+                }
+            } catch (err) {
+                console.error('Submit error:', err);
+                alert('提交失敗：' + err.message);
+            } finally {
+                hideLoading();
+                btn.disabled = false;
+            }
+        }
+
+        function showLoading(text) { document.getElementById('loadingText').textContent = text; document.getElementById('loadingOverlay').classList.add('active'); }
+        function hideLoading() { document.getElementById('loadingOverlay').classList.remove('active'); }
+        function showSuccess() {
+            document.getElementById('feedbackForm').style.display = 'none';
+            document.getElementById('noticeBox').style.display = 'none';
+            document.getElementById('successPage').classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        function resetForm() {
+            document.getElementById('feedbackForm').reset();
+            document.getElementById('feedbackForm').style.display = 'block';
+            document.getElementById('noticeBox').style.display = 'block';
+            document.getElementById('successPage').classList.remove('active');
+            selectedConsultation = null;
+            document.getElementById('selectedMember').className = 'selected-member';
+            document.getElementById('clientName').value = '';
+            document.getElementById('clientPhone').value = '';
+            document.getElementById('searchKeyword').value = '';
+            document.getElementById('searchResults').className = 'search-results';
+            document.getElementById('coachName').value = currentCoach.name || '';
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('sessionTime').value = now.toISOString().slice(0, 16);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        function formatSessionTime(dateTimeStr) {
+            if (!dateTimeStr) return '';
+            const date = new Date(dateTimeStr);
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            const hours = date.getHours();
+            const minutes = date.getMinutes();
+            const seconds = date.getSeconds();
+            
+            const period = hours >= 12 ? '下午' : '上午';
+            const hour12 = hours > 12 ? hours - 12 : (hours === 0 ? 12 : hours);
+            
+            const pad = (n) => n.toString().padStart(2, '0');
+            
+            return `${year}/${month}/${day} ${period} ${hour12}:${pad(minutes)}:${pad(seconds)}`;
+        }
+
+        function formatPhone(phone) {
+            if (!phone) return '';
+            phone = phone.toString().trim();
+            if (phone.length === 9 && !phone.startsWith('0')) {
+                return '0' + phone;
+            }
+            return phone;
+        }
+
+        function escapeHtml(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+    </script>
+</body>
+</html>
