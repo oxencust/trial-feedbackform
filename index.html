@@ -417,9 +417,9 @@
                 if (response.ok) {
                     const data = await response.json();
                     if (data && data.found) {
-    currentCoach.name = data.name;
+    currentCoach.name = (data.name || '').trim();
     currentCoach.coachId = data.id;
-    currentCoach.coachType = data.coachType;
+    currentCoach.coachType = (data.coachType || '').trim();
     showCoachInfo();
     showForm();
     preSelectCourseType(data.coachType);
@@ -664,19 +664,7 @@
         function formatSessionTime(dateTimeStr) {
             if (!dateTimeStr) return '';
             const date = new Date(dateTimeStr);
-            const year = date.getFullYear();
-            const month = date.getMonth() + 1;
-            const day = date.getDate();
-            const hours = date.getHours();
-            const minutes = date.getMinutes();
-            const seconds = date.getSeconds();
-            
-            const period = hours >= 12 ? '下午' : '上午';
-            const hour12 = hours > 12 ? hours - 12 : (hours === 0 ? 12 : hours);
-            
-            const pad = (n) => n.toString().padStart(2, '0');
-            
-            return `${year}/${month}/${day} ${period} ${hour12}:${pad(minutes)}:${pad(seconds)}`;
+            return date.toISOString();
         }
 
         function formatPhone(phone) {
