@@ -344,7 +344,8 @@
         const CONFIG = {
             liffId: '2007947083-lOR22mML',
             edgeFunctionUrl: 'https://mnjilhpztnowaplggvkk.supabase.co/functions/v1/booking-api',
-            makeWebhookUrl: 'https://hook.us2.make.com/mdd5t4rm1dhfegf6i8dmseiqcja6szye'
+            makeWebhookUrl: 'https://hook.us2.make.com/mdd5t4rm1dhfegf6i8dmseiqcja6szye',
+            gasUrl: 'https://script.google.com/macros/s/AKfycbyo8Hmpo-YVIgeSLGXhAQuci1JcQhDuEpLWqrf1ODfvg7bMbv5Y9oCZGM7yCNibdQhu/exec'
         };
 
         let currentCoach = { lineId: '', name: '', displayName: '', coachId: '', coachType: '' };
@@ -615,14 +616,27 @@
                     source: 'web_form'
                 };
                 
+                // 1. 送到 Make webhook → 寫入回報表 Sheet
                 const response = await fetchWithTimeout(CONFIG.makeWebhookUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ action: 'submit', ...data })
 }, 30000);
-                
+
                 const result = await response.json();
                 if (result.success) {
+                    // 2. 送到 GAS → 回寫諮詢單 Sheet（背景執行，不影響主流程）
+                    try {
+                        await fetchWithTimeout(CONFIG.gasUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'text/plain' },
+                            redirect: 'follow',
+                            body: JSON.stringify(data)
+                        }, 15000);
+                        console.log('✅ GAS 諮詢單回寫成功');
+                    } catch (gasErr) {
+                        console.warn('⚠️ GAS 諮詢單回寫失敗（不影響主提交）:', gasErr);
+                    }
                     showSuccess();
                 } else {
                     throw new Error(result.error || '提交失敗');
