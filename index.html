@@ -644,9 +644,10 @@
             } catch (err) {
                 console.error('Submit error:', err);
                 alert('提交失敗：' + err.message);
+                // 只有失敗時才恢復按鈕，成功後保持 disabled 防止重複送出
+                btn.disabled = false;
             } finally {
                 hideLoading();
-                btn.disabled = false;
             }
         }
 
